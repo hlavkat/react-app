@@ -69,18 +69,18 @@ const Home = () => {
     validateData(newEmployee);
   }, [newEmployee]);
 
-  useEffect(() => {
-    console.log({
-      calcmen: getCountGender(MAN),
-      calcwomen: getCountGender(WOMAN),
-      men,
-      women,
-    });
-  });
+  //   useEffect(() => {
+  //     console.log({
+  //       calcmen: getCountGender(MAN),
+  //       calcwomen: getCountGender(WOMAN),
+  //       men,
+  //       women,
+  //     });
+  //   });
   useEffect(() => {
     setMen(getCountGender(MAN));
     setWomen(getCountGender(WOMAN));
-  }, [listOfEmployees,getCountGender]);
+  }, [listOfEmployees]); //eslint-disable-line
 
   const handleAdd = () => {
     setListOfEmployees((listOfEmployees) => {
@@ -108,6 +108,39 @@ const Home = () => {
     setListOfEmployees(newListOfEmployees);
   };
 
+  ///
+
+  const [workValid, setWorkValid] = useState(false);
+
+  const [workPlanning, setWorkPlanning] = useState({
+    requiredMeters: "",
+    timeLimit: "",
+  });
+  const handleCheck = (e) => {
+    const updateWork = {
+      ...workPlanning,
+      [e.target.name]: e.target.value,
+    };
+    setWorkPlanning(updateWork);
+  };
+  const isWorkPossible = () => {
+    const totalWork = men + women * 0.5;
+    const workPossible = totalWork * parseFloat(workPlanning.timeLimit);
+    return workPossible >= parseFloat(workPlanning.requiredMeters);
+  };
+
+  useEffect(() => {
+    setWorkValid(isWorkPossible());
+  }, [workPlanning, men, women]); //eslint-disable-line
+
+  const handleMessage = () => {
+    alert("Prace je naplanovana");
+    setWorkPlanning({
+      requiredMeters: "",
+      timeLimit: "",
+    });
+  };
+
   return (
     <PageContainer>
       <Buttons>
@@ -131,7 +164,7 @@ const Home = () => {
           <EmployeesList>
             {listOfEmployees.map((employee) => {
               return (
-                <Employees key={employee.id}>
+                <Employees key={employee.id} gender={employee.gender}>
                   {employee.name} {employee.surename} - {employee.gender}
                   <RemoveButton onClick={() => handleRemove(employee.id)}>
                     x
@@ -184,11 +217,32 @@ const Home = () => {
       {activeTab === "tasks" && (
         <div className="tasks">
           <h2>PLANNING EXCAVATION WORKS</h2>
-          <p>Men: {men}</p>
-          <p>Women: {women}</p>
-          <Input placeholder="Enter meters..." />
-          <Input placeholder="Enter the hours..." />
-          <Button disabled>Work plainning</Button>
+          <p className="green">Men: {men}</p>
+          <p className="green">Women: {women}</p>
+          <label>
+            <Input
+              type="number"
+              placeholder="Enter meters..."
+              name="requiredMeters"
+              min="0"
+              value={workPlanning.requiredMeters}
+              onChange={handleCheck}
+            />
+          </label>
+          <label>
+            <Input
+              type="number"
+              placeholder="Enter the hours..."
+              name="timeLimit"
+              min="0"
+              value={workPlanning.timeLimit}
+              onChange={handleCheck}
+            />
+          </label>
+
+          <Button disabled={!workValid} onClick={handleMessage}>
+            Work plainning
+          </Button>
         </div>
       )}
     </PageContainer>

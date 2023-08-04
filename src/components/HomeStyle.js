@@ -22,9 +22,13 @@ export const Employees = styled.div`
   align-items: center;
   justify-content: space-between;
   background-color: white;
-  &:nth-child(even) {
-    background-color: yellow;
-  }
+  ${(props) => {
+    if (props.gender === "woman") {
+      return `
+            background-color: yellow;  
+        `;
+    }
+  }}
 `;
 export const EmployeeForm = styled(EmployeesList)`
   flex-direction: row;
@@ -40,13 +44,18 @@ export const Input = styled.input`
 `;
 export const RadioForm = styled(EmployeeForm)`
   flex-direction: column;
-  align-items: flex-start;
+  text-align: center;
 `;
 export const Label = styled.label`
   background-color: white;
   color: black;
   padding: 0 5px;
   margin: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  &:hover {
+    background-color: green;
+  }
 `;
 export const InputRadio = styled(Input)`
   height: 12px;
